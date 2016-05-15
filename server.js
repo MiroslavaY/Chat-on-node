@@ -1,7 +1,17 @@
 var mongo = require('mongodb').MongoClient;
-var port = process.env.PORT || '8080';
-var mongoConnectionPath = 'mongodb://127.0.0.1/chatDB' || process.env.MONGOLAB_URI;
+//var port = process.env.PORT || '8080';
 
+var server_port = process.env.OPENSHIFT_NODEJS_PORT || 8080;
+var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
+
+
+
+//--------------------------------------------------------
+var mongoConnectionPath = 'mongodb://localhost:27017/chatDB' ;
+
+if(process.env.OPENSHIFT_MONGODB_DB_URL){
+    mongoConnectionPath = process.env.OPENSHIFT_MONGODB_DB_URL + 'chatDB';
+    }
 
 //-----------------------------------------------------------------------------
 
@@ -11,8 +21,10 @@ var server = require('http').createServer(app);
 app.use(express.static('public'));
 var client = require('socket.io').listen(server).sockets;
 
-
-server.listen(port);
+server.listen(server_port, server_ip_address, function () {
+    console.log( "Listening on " + server_ip_address + ", port " +server_port )
+});
+//server.listen(port);
 
 
 app.get('/', function (req, res) {
