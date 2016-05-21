@@ -1,19 +1,22 @@
-var mongo = require('mongodb').MongoClient;
-//var port = process.env.PORT || '8080';
 
-var server_port = process.env.OPENSHIFT_NODEJS_PORT || 8080;
 var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
+var server_port = process.env.OPENSHIFT_NODEJS_PORT || 8080;
+var mongo = require('mongodb').MongoClient;
 
 
 
-//--------------------------------------------------------
-var mongoConnectionPath = 'mongodb://localhost:27017/chatDB' ;
 
-if(process.env.OPENSHIFT_MONGODB_DB_URL){
-    mongoConnectionPath = process.env.OPENSHIFT_MONGODB_DB_URL + 'chatDB';
-    }
 
-//-----------------------------------------------------------------------------
+var mongoConnectionPath = '127.0.0.1:27017/mytestchat';
+
+if(process.env.OPENSHIFT_MONGODB_DB_PASSWORD){
+    mongoConnectionPath= process.env.OPENSHIFT_MONGODB_DB_USERNAME + ":" +
+        process.env.OPENSHIFT_MONGODB_DB_PASSWORD + "@" +
+        process.env.OPENSHIFT_MONGODB_DB_HOST + ':' +
+        process.env.OPENSHIFT_MONGODB_DB_PORT + '/' +
+        process.env.OPENSHIFT_APP_NAME;
+}
+
 
 var express = require('express');
 var app = express();
@@ -24,14 +27,13 @@ var client = require('socket.io').listen(server).sockets;
 server.listen(server_port, server_ip_address, function () {
     console.log( "Listening on " + server_ip_address + ", port " +server_port )
 });
-//server.listen(port);
+
 
 
 app.get('/', function (req, res) {
     res.sendfile(__dirname + '/index.html');
 });
 
-//--------------------------------------------------------------------------------------------------------------------
 
 mongo.connect(mongoConnectionPath, function (err, db) {
 
@@ -95,3 +97,4 @@ mongo.connect(mongoConnectionPath, function (err, db) {
         });
     }
 });
+
